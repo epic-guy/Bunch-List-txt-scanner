@@ -1,0 +1,5 @@
+1.Getting more than 43,000 results crashes the app
+
+2.choosing a file then searching then choosing the next time but cancelling leads to filename not being erased
+
+3.many error dialog boxes must be implemented

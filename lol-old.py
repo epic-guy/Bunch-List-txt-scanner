@@ -52,7 +52,7 @@ class Ui_Dialog(object):
         self.inp.setGeometry(QtCore.QRect(120, 140, 251, 21))
         self.inp.setObjectName("inp")
         
-        self.tableView = QtWidgets.QTableWidget(Dialog)
+        self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(30, 170, 521, 221))
         self.tableView.setObjectName("tableView")
         
@@ -74,11 +74,8 @@ class Ui_Dialog(object):
         self.search = QtWidgets.QLabel(Dialog)
         self.search.setGeometry(QtCore.QRect(30, 140, 81, 21))
         self.search.setObjectName("search")
-
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(30, 400, 191, 31))
-        self.label.setObjectName("label")
         
+
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -93,9 +90,6 @@ class Ui_Dialog(object):
         self.quit.setText(_translate("Dialog", "Quit"))
         self.save.setText(_translate("Dialog", "Save Results"))
         self.search.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-size:10pt; font-weight:600;\">Search Text:</span></p></body></html>"))
-        self.label.setText(_translate("Dialog", "Matches Found: 0"))
-
-
     def accept(self):
         self.Filename=None
         self.fname=None
@@ -125,22 +119,8 @@ class Ui_Dialog(object):
                 #print("Email ID:",self.data[i][0])
                 #print("Password:",self.data[i][1])
                 self.disp.append((self.data[i][0],self.data[i][1]))
-        header_labels = ['E-Mails',"Passwords"]
-        self.label.setText("Matches Found: "+str(len(self.disp)))
-        if self.disp != []:
-            #self.tableView.setRowCount(len(self.disp))
-            self.tableView.setColumnCount(2)
-            self.tableView.setHorizontalHeaderLabels(header_labels)
-            header = self.tableView.horizontalHeader() 
-            header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-            header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-            for row in self.disp:
-                inx = self.disp.index(row)
-                self.tableView.insertRow(inx)
-                self.tableView.setItem(inx,0,QtWidgets.QTableWidgetItem(str(row[0])))
-                self.tableView.setItem(inx,1,QtWidgets.QTableWidgetItem(str(row[1].strip("\n"))))
-        else:
-            QtWidgets.QMessageBox.question(None, 'Error', "Enter Something to search for!", QtWidgets.QMessageBox.Ok)
+        self.model = TableModel(self.disp)
+        self.tableView.setModel(self.model)
     def Saved(self):
         name=str(time.time())+'.csv'
         with open(name,'w+') as f:
@@ -151,7 +131,22 @@ class Ui_Dialog(object):
 
     def close(self):
         sys.exit()
-      
+
+class TableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        self._data = data
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+                return self._data[index.row()][index.column()]
+
+    def rowCount(self, index):
+        return len(self._data)
+    def columnCount(self, index):
+        return 2
+        
+
 if __name__ == "__main__":
     import sys
 
